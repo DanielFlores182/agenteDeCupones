@@ -97,3 +97,21 @@ def finalizar_compra(compra_id: str):
         "comprados": compra["comprados"],
         "total_gastado": sum(p["precio"] for p in compra["comprados"])
     }
+# ejemplo de uso 
+
+# POST /iniciar_compra
+# y recibiras una compra_id #######IMPORTANTE
+# con eso puedes seguir interactuando con esa compra actual
+
+# ej para compra
+
+# POST /comprar_item/{compra_id}
+# mandando este json 
+# {
+#   "nombre": "Tomate (kg)",
+#   "precio": 7
+# }
+# y para finalizar 
+# POST /finalizar_compra/{compra_id}
+
+

@@ -50,3 +50,35 @@ def generar_reporte(compra: dict, monto_inicial: float):
 
 def obtener_reportes():
     return leer_json(FINALIZADAS_PATH, [])
+
+##########ejemplo entrada 
+# {
+#   "compra": {
+#     "comprados": [
+#       { "nombre": "Papa (kg)", "precio": 6 },
+#       { "nombre": "Tomate (kg)", "precio": 7 }
+#     ]
+#   },
+#   "monto_inicial": 20
+# }
+######## ejemplo salida
+########sobrando dinero
+
+# {
+#   "estado": "sobrante",
+#   "total_gastado": 13,
+#   "monto_cupon": 20,
+#   "monto_sobrante": 7,
+#   "monto_faltante": 0,
+#   "productos_comprados": [...]
+# }
+############ejemplo salida
+############faltando dinero
+# {
+#   "estado": "faltante",
+#   "total_gastado": 25,
+#   "monto_cupon": 20,
+#   "monto_sobrante": 0,
+#   "monto_faltante": 5,
+#   "productos_comprados": [...]
+# }

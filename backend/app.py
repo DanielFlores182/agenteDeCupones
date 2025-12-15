@@ -8,6 +8,7 @@ from services.agente_compras import (
     finalizar_compra
 )
 from services.reporte import generar_reporte, obtener_reportes
+from services.cargar_productos import cargar_productos
 
 
 app = FastAPI()
@@ -70,3 +71,18 @@ def reporte_compra_endpoint(data: dict):
 @app.get("/reportes")
 def obtener_reportes_endpoint():
     return obtener_reportes()
+
+@app.get("/productos")
+def productos_endpoint():
+    """
+    Devuelve toda la lista de productos del supermercado
+    """
+    return cargar_productos()
+
+# ejemplo de llamada
+
+# fetch("http://localhost:4000/RUTASERVICIO")
+#   .then(res => res.json())
+#   .then(data => {
+#     console.log(data); // Muestra todas las categorías y productos
+#   });
