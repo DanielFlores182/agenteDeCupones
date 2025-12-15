@@ -1,0 +1,16 @@
+{
+  "limpieza": [
+    { "nombre": "Detergente", "precio": 15 },
+    { "nombre": "Jabón", "precio": 5 },
+    { "nombre": "Lavandina", "precio": 8 }
+  ],
+  "verduras": [
+    { "nombre": "Papa (kg)", "precio": 6 },
+    { "nombre": "Tomate (kg)", "precio": 7 },
+    { "nombre": "Cebolla (kg)", "precio": 5 }
+  ],
+  "carnes": [
+    { "nombre": "Pollo (kg)", "precio": 18 },
+    { "nombre": "Carne de res (kg)", "precio": 30 }
+  ]
+}
