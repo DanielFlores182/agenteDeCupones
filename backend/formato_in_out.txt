@@ -1,0 +1,20 @@
+datos de entrada :
+
+{
+  "monto": 40,
+  "preferencia": "verduras"
+}
+
+datos de salida :
+
+{
+  "monto_cupon": 40,
+  "preferencia": "verduras",
+  "productos_recomendados": [
+    { "nombre": "Papa (kg)", "precio": 6 },
+    { "nombre": "Cebolla (kg)", "precio": 5 },
+    { "nombre": "Tomate (kg)", "precio": 7 }
+  ],
+  "total_gastado": 18,
+  "saldo_restante": 22
+}
