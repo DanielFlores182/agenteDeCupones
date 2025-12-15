@@ -1,0 +1,3 @@
+fastapi
+uvicorn
+#para montar en la carpeta de backend ejecutar >>>>  pip install -r requirements.txt
