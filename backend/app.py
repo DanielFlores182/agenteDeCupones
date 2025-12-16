@@ -11,7 +11,7 @@ from services.agente_compras import (
 )
 from services.reporte import generar_reporte, obtener_reportes
 from services.cargar_productos import cargar_productos
-
+from services.cargar_canaston import cargar_ultimo_cupon
 
 class SolicitudRuta(BaseModel):
     destino: str
@@ -19,7 +19,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],)
@@ -90,6 +90,37 @@ def productos_endpoint():
     Devuelve toda la lista de productos del supermercado
     """
     return cargar_productos()
+
+
+@app.get("/ultimo_cupon")
+def ultimo_cupon_endpoint():
+    """
+    Devuelve el último canastón guardado
+    """
+    return cargar_ultimo_cupon()
+
+@app.get("/ultimo_canaston")  
+def obtener_ultimo_canaston_endpoint():
+    try:
+        canastones = leer_canastones()
+        
+        if not canastones:
+            return { "error": "No hay canastones guardados", "data": None }
+        
+        ultimo_canaston = canastones[-1]
+        
+        return {
+            "success": True,
+            "data": ultimo_canaston,
+            "total_canastones": len(canastones)
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Error al obtener el último canastón: {str(e)}",
+            "data": None
+        }
 
 # ejemplo de llamada
 

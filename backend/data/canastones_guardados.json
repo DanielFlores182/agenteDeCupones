@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "productos": [
+      { "nombre": "Leche Entera 1L", "precio": 7.5 },
+      { "nombre": "Pan Integral", "precio": 5.0 },
+      { "nombre": "Huevos 12u", "precio": 12.0 },
+      { "nombre": "Manzanas 1kg", "precio": 10.0 }
+    ],
+    "total_gastado": 34.5,
+    "saldo_restante": 65.5,
+    "estrategia": "Canastón Saludable",
+    "fecha_creacion": "2025-12-16T10:00:00"
+  },
+  {
+    "productos": [
+      { "nombre": "Arroz 1kg", "precio": 6.0 },
+      { "nombre": "Aceite Vegetal 1L", "precio": 15.0 },
+      { "nombre": "Azúcar 1kg", "precio": 5.0 }
+    ],
+    "total_gastado": 26.0,
+    "saldo_restante": 74.0,
+    "estrategia": "Canastón Básico",
+    "fecha_creacion": "2025-12-15T16:30:00"
+  },
+  {
+    "productos": [
+      { "nombre": "Jugo Naranja 1L", "precio": 8.0 },
+      { "nombre": "Galletas Choco", "precio": 6.5 },
+      { "nombre": "Queso Mozzarella 200g", "precio": 14.0 }
+    ],
+    "total_gastado": 28.5,
+    "saldo_restante": 71.5,
+    "estrategia": "Canastón Dulce",
+    "fecha_creacion": "2025-12-14T12:15:00"
+  }
+]
+
