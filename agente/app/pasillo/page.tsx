@@ -22,25 +22,50 @@ export default function Planificador() {
   const [pasilloSeleccionado, setPasilloSeleccionado] = useState<string | null>(null);
   const [canastonActual, setCanastonActual] = useState<Producto[]>([]);
   const [compraId, setCompraId] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 1️⃣ Cargar último canastón y productos del supermercado
   useEffect(() => {
-    fetch('http://localhost:8000/ultimo_cupon')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.error) {
+    const fetchUltimoCanaston = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/ultimo_canaston');
+        const data = await res.json();
+        
+        console.log('Respuesta completa:', data);
+        
+        if (data.data) {
+          setUltimoCanaston(data.data);
+          setSugerencias([data.data]);
+          setCanastonActual(data.data.productos || []);
+        } else if (data.productos) {
           setUltimoCanaston(data);
-          setSugerencias([data]); // inicialmente la sugerencia es el último canastón
-          setCanastonActual(data.productos);
+          setSugerencias([data]);
+          setCanastonActual(data.productos || []);
+        } else {
+          setError('No se encontró canastón');
         }
-      });
+      } catch (err) {
+        console.error('Error:', err);
+        setError('Error al cargar el canastón');
+      } finally {
+        setCargando(false);
+      }
+    };
 
-    fetch('http://localhost:8000/productos')
-      .then(res => res.json())
-      .then(data => setProductosJSON(data));
+    const fetchProductos = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/productos');
+        const data = await res.json();
+        setProductosJSON(data);
+      } catch (err) {
+        console.error('Error cargando productos:', err);
+      }
+    };
+
+    fetchUltimoCanaston();
+    fetchProductos();
   }, []);
 
-  // Productos del pasillo seleccionado
   const productosPasillo = React.useMemo(() => {
     if (pasilloSeleccionado && productosJSON[pasilloSeleccionado]) {
       return productosJSON[pasilloSeleccionado];
@@ -48,103 +73,170 @@ export default function Planificador() {
     return [];
   }, [pasilloSeleccionado, productosJSON]);
 
-  // Manejo de selección de producto
   const handleSeleccionProducto = async (producto: Producto) => {
     if (!ultimoCanaston) return;
 
-    // 2️⃣ Iniciar compra si no hay compra activa
     if (!compraId) {
-      const res = await fetch('http://localhost:8000/iniciar_compra', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ultimoCanaston)
-      });
-      const data = await res.json();
-      setCompraId(data.id || data.compra_id); // backend puede devolver "id"
+      try {
+        const res = await fetch('http://localhost:8000/iniciar_compra', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ultimoCanaston)
+        });
+        const data = await res.json();
+        setCompraId(data.id || data.compra_id);
+      } catch (err) {
+        console.error('Error iniciando compra:', err);
+      }
     }
 
     if (!compraId) return;
 
-    // 3️⃣ Comprar el item seleccionado
-    const res = await fetch(`http://localhost:8000/comprar_item/${compraId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(producto)
-    });
-    const data = await res.json();
-
-    // 4️⃣ Actualizar canastón actual y sugerencias recalculadas
-    setCanastonActual(data.canaston_actual.productos || []);
-    setSugerencias([data.canaston_actual]); // recalculamos la sugerencia
+    try {
+      const res = await fetch(`http://localhost:8000/comprar_item/${compraId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(producto)
+      });
+      const data = await res.json();
+      setCanastonActual(data.canaston_actual.productos || []);
+      setSugerencias([data.canaston_actual]);
+    } catch (err) {
+      console.error('Error comprando item:', err);
+    }
   };
 
-  // 5️⃣ Finalizar compra
   const handleFinalizarCompra = async () => {
     if (!compraId) return;
 
-    await fetch(`http://localhost:8000/finalizar_compra/${compraId}`, { method: 'POST' });
-    alert('Compra finalizada');
-    setCompraId(null);
-    setCanastonActual([]);
-    setSugerencias(ultimoCanaston ? [ultimoCanaston] : []);
+    try {
+      await fetch(`http://localhost:8000/finalizar_compra/${compraId}`, { method: 'POST' });
+      alert('Compra finalizada');
+      setCompraId(null);
+      setCanastonActual([]);
+      setSugerencias(ultimoCanaston ? [ultimoCanaston] : []);
+    } catch (err) {
+      console.error('Error finalizando compra:', err);
+    }
   };
 
-  return (
-    <div style={{ display: 'flex', gap: '20px', padding: '20px' }}>
-      {/* Ventana de sugerencias */}
-      <div style={{ flex: 1 }}>
-        <h2>Sugerencias</h2>
-        {sugerencias.map((c, i) => (
-          <div key={i} style={{ border: '2px solid blue', padding: '10px', marginBottom: '10px' }}>
-            <p><strong>{c.estrategia || 'Canastón'}</strong></p>
-            <p>Total: {c.total_gastado}, Restante: {c.saldo_restante}</p>
-            <ul>
-              {c.productos.map((p, idx) => (
-                <li key={idx}>{p.nombre} - Bs {p.precio}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+  if (cargando) {
+    return <div style={{ padding: '20px' }}>Cargando último canastón...</div>;
+  }
 
-      {/* Pasillos y productos */}
-      <div style={{ flex: 1 }}>
-        <h2>Pasillos</h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-          {PASILLOS.map(p => (
-            <button key={p} onClick={() => setPasilloSeleccionado(p)}
-                    style={{ padding: '10px', minWidth: '120px', backgroundColor: pasilloSeleccionado === p ? '#E3001B' : '#ccc', color: pasilloSeleccionado === p ? '#fff' : '#000', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              {p}
-            </button>
+  if (error) {
+    return (
+      <div style={{ padding: '20px' }}>
+        <p>Error: {error}</p>
+        <p>Verifica que:</p>
+        <ul>
+          <li>El backend esté corriendo en http://localhost:8000</li>
+          <li>La ruta /ultimo_canaston exista</li>
+          <li>Hay canastones guardados en canastones_guardados.json</li>
+        </ul>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-6 p-6 bg-gradient-to-br from-gray-50 to-white">
+  <div className="flex-1 bg-white rounded-xl p-4 shadow-md">
+    <h2 className="text-2xl font-bold text-blue-800 mb-6 pb-2 border-b-2 border-blue-300">Sugerencias</h2>
+    {sugerencias.length > 0 ? (
+      sugerencias.map((c, i) => (
+        <div key={i} className="border-2 border-blue-400 p-4 mb-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm hover:shadow-md transition-shadow">
+          <p className="font-bold text-lg text-blue-700 mb-2">{c.estrategia || 'Canastón'}</p>
+          <p className="text-gray-700 mb-3">
+            <span className="font-semibold text-red-600">Total: Bs {c.total_gastado}</span>, 
+            <span className="font-semibold text-green-600 ml-4">Restante: Bs {c.saldo_restante}</span>
+          </p>
+          <ul className="mt-3 space-y-2">
+            {(c.productos || []).map((p, idx) => (
+              <li key={idx} className="text-gray-800 bg-white p-2 rounded border border-gray-200 shadow-sm flex justify-between">
+                <span>{p.nombre}</span>
+                <span className="font-semibold text-red-600">Bs {p.precio}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-8 bg-gray-100 rounded-lg border border-dashed border-gray-300">
+        <p className="text-gray-500">No hay sugerencias</p>
+      </div>
+    )}
+  </div>
+
+  <div className="flex-1 bg-white rounded-xl p-4 shadow-md">
+    <h2 className="text-2xl font-bold text-blue-800 mb-6 pb-2 border-b-2 border-orange-300">Pasillos</h2>
+    <div className="flex flex-wrap gap-3 mb-6">
+      {PASILLOS.map(p => (
+        <button 
+          key={p} 
+          onClick={() => setPasilloSeleccionado(p)}
+          className={`px-4 py-3 min-w-[130px] rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md ${
+            pasilloSeleccionado === p 
+              ? 'bg-[#E3001B] text-white shadow-lg transform -translate-y-1' 
+              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+          }`}
+        >
+          {p}
+        </button>
+      ))}
+    </div>
+
+    {pasilloSeleccionado && (
+      <div className="mt-8 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5 border border-red-200 shadow-sm">
+        <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-red-300">Productos de {pasilloSeleccionado}</h3>
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+          {productosPasillo.map((prod, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => handleSeleccionProducto(prod)}
+              className="border border-gray-300 p-3 rounded-lg bg-white cursor-pointer hover:border-[#E3001B] hover:shadow-md transition-all hover:translate-x-1"
+            >
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-800">{prod.nombre}</span>
+                <span className="font-bold text-[#E3001B] bg-red-50 px-3 py-1 rounded">Bs {prod.precio}</span>
+              </div>
+            </div>
           ))}
         </div>
+      </div>
+    )}
+  </div>
 
-        {pasilloSeleccionado && (
-          <div style={{ marginTop: '20px' }}>
-            <h3>Productos de {pasilloSeleccionado}</h3>
-            {productosPasillo.map((prod, idx) => (
-              <div key={idx} style={{ border: '1px solid gray', padding: '8px', marginBottom: '5px', cursor: 'pointer' }} onClick={() => handleSeleccionProducto(prod)}>
-                {prod.nombre} - Bs {prod.precio}
+  <div className="flex-1 bg-white rounded-xl p-4 shadow-md">
+    <h2 className="text-2xl font-bold text-blue-800 mb-6 pb-2 border-b-2 border-green-300">Canastón Actual</h2>
+    {canastonActual.length > 0 ? (
+      <>
+        <div className="space-y-3 mb-6 max-h-[400px] overflow-y-auto pr-2">
+          {canastonActual.map((prod, idx) => (
+            <div key={idx} className="border border-gray-300 p-3 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm hover:shadow transition-shadow">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">{idx + 1}</span>
+                  <span className="font-medium text-gray-800">{prod.nombre}</span>
+                </div>
+                <span className="font-bold text-[#E3001B]">Bs {prod.precio}</span>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+        <button 
+          onClick={handleFinalizarCompra}
+          className="w-full py-3 bg-gradient-to-r from-[#E3001B] to-red-600 text-white rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 cursor-pointer"
+        >
+          Finalizar Compra
+        </button>
+      </>
+    ) : (
+      <div className="text-center py-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border border-dashed border-gray-400">
+        <p className="text-gray-600">No hay productos en el canastón actual</p>
+        <p className="text-sm text-gray-500 mt-2">Selecciona productos de los pasillos</p>
       </div>
-
-      {/* Canastón actual */}
-      <div style={{ flex: 1 }}>
-        <h2>Canastón Actual</h2>
-        {canastonActual.map((prod, idx) => (
-          <div key={idx} style={{ border: '1px solid gray', padding: '8px', marginBottom: '5px' }}>
-            {prod.nombre} - Bs {prod.precio}
-          </div>
-        ))}
-        {canastonActual.length > 0 && (
-          <button onClick={handleFinalizarCompra} style={{ marginTop: '10px', padding: '10px', backgroundColor: '#E3001B', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-            Finalizar Compra
-          </button>
-        )}
-      </div>
-    </div>
+    )}
+  </div>
+</div>
   );
 }
