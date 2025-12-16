@@ -25,11 +25,16 @@ export default function BasketCard({ basket, onClick }: Props) {
 
       <div className="flex justify-between items-start p-10 text-gray-700 text-sm">
         <div className="flex-1 space-y-1 font-bold">
-          {basket.productos.map((producto, index) => (
-            <p key={index}>
-              • {producto.nombre}
-            </p>
-          ))}
+          <div className="space-y-1 max-h-40 overflow-hidden relative">
+    {basket.productos.slice(0, 10).map((producto, index) => (
+      <p key={index}>• {producto.nombre}</p>
+    ))}
+
+    {basket.productos.length > 10 && (
+      <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent flex items-center justify-center">
+      </div>
+    )}
+  </div>
         </div>
 
         <button
