@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 
 export type Producto = { nombre: string; precio: number };
-export type Canaston = { productos: Producto[]; total_gastado: number; saldo_restante: number; estrategia?: string };
+export type Canaston = { productos: Producto[]; total_gastado: number; saldo_restante: number; estrategia?: string; id?: string; fecha?: string };
 export type ProductosJSON = Record<string, Producto[]>;
 
 const PASILLOS = [
@@ -30,15 +30,17 @@ export default function Planificador() {
       try {
         const res = await fetch('http://localhost:8000/ultimo_canaston');
         const data = await res.json();
-        
+
         console.log('Respuesta completa:', data);
-        
-        if (data.data) {
-          setUltimoCanaston(data.data);
-          setSugerencias([data.data]);
-        } else if (data.productos) {
-          setUltimoCanaston(data);
-          setSugerencias([data]);
+
+        if (data.data && data.data.canaston) {
+          const canaston = {
+            ...data.data.canaston,
+            id: data.data.id,
+            fecha: data.data.fecha
+          };
+          setUltimoCanaston(canaston);
+          setSugerencias([canaston]);
         } else {
           setError('No se encontró canastón');
         }
@@ -76,7 +78,7 @@ export default function Planificador() {
 
     let compraActualId = compraId;
 
-    // 1️⃣ Iniciar compra solo una vez
+    // Iniciar compra solo una vez
     if (!compraActualId) {
       try {
         const res = await fetch('http://localhost:8000/iniciar_compra', {
@@ -89,7 +91,6 @@ export default function Planificador() {
 
         const data = await res.json();
         compraActualId = data.id || data.compra_id;
-
         setCompraId(compraActualId);
       } catch (err) {
         console.error('Error iniciando compra:', err);
@@ -97,7 +98,7 @@ export default function Planificador() {
       }
     }
 
-    // 2️⃣ Comprar producto
+    // Comprar producto
     try {
       const res = await fetch(
         `http://localhost:8000/comprar_item/${compraActualId}`,
@@ -111,10 +112,7 @@ export default function Planificador() {
       if (!res.ok) throw new Error('Error comprando item');
 
       const data = await res.json();
-
-      // Actualizamos sugerencias con productos restantes
       setSugerencias([data.canaston_actual]);
-      // Actualizamos carrito con productos seleccionados
       setCarrito(data.carrito || []);
     } catch (err) {
       console.error('Error comprando item:', err);
