@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from services.obtener_cupon import obtener_cupon
 from services.obtener_ruta import planificar_ruta
 from fastapi.middleware.cors import CORSMiddleware
 from services.obtener_sugerencias import agente_cupon
