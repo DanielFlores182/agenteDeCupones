@@ -1,26 +1,37 @@
 [
   {
-    "id": "canaston_001",
-    "monto_cupon": 100,
-    "preferencia": "verduras",
     "productos": [
-      { "nombre": "Papa (kg)", "precio": 6, "cantidad": 2 },
-      { "nombre": "Tomate (kg)", "precio": 7, "cantidad": 1 },
-      { "nombre": "Pollo (kg)", "precio": 18, "cantidad": 1 },
-      { "nombre": "Detergente", "precio": 15, "cantidad": 1 }
+      { "nombre": "Leche Entera 1L", "precio": 7.5 },
+      { "nombre": "Pan Integral", "precio": 5.0 },
+      { "nombre": "Huevos 12u", "precio": 12.0 },
+      { "nombre": "Manzanas 1kg", "precio": 10.0 }
     ],
-    "total": 52,
-    "fecha": "2025-12-16T01:45:00"
+    "total_gastado": 34.5,
+    "saldo_restante": 65.5,
+    "estrategia": "Canastón Saludable",
+    "fecha_creacion": "2025-12-16T10:00:00"
   },
   {
-    "id": "canaston_002",
-    "monto_cupon": 80,
-    "preferencia": "carnes",
     "productos": [
-      { "nombre": "Carne de res (kg)", "precio": 30, "cantidad": 2 },
-      { "nombre": "Pollo (kg)", "precio": 18, "cantidad": 1 }
+      { "nombre": "Arroz 1kg", "precio": 6.0 },
+      { "nombre": "Aceite Vegetal 1L", "precio": 15.0 },
+      { "nombre": "Azúcar 1kg", "precio": 5.0 }
     ],
-    "total": 78,
-    "fecha": "2025-12-16T01:50:00"
+    "total_gastado": 26.0,
+    "saldo_restante": 74.0,
+    "estrategia": "Canastón Básico",
+    "fecha_creacion": "2025-12-15T16:30:00"
+  },
+  {
+    "productos": [
+      { "nombre": "Jugo Naranja 1L", "precio": 8.0 },
+      { "nombre": "Galletas Choco", "precio": 6.5 },
+      { "nombre": "Queso Mozzarella 200g", "precio": 14.0 }
+    ],
+    "total_gastado": 28.5,
+    "saldo_restante": 71.5,
+    "estrategia": "Canastón Dulce",
+    "fecha_creacion": "2025-12-14T12:15:00"
   }
 ]
+
