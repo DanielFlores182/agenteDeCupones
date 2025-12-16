@@ -25,7 +25,7 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
 
   // Cargar sugerencias de canastones
   useEffect(() => {
-    fetch('http://localhost:4000/recomendar_canastones', {
+    fetch('http://localhost:8000/recomendar_canastones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ monto, preferencia })
@@ -33,7 +33,7 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
       .then(res => res.json())
       .then(data => setCanastones(data.canastones || []));
     
-    fetch('http://localhost:4000/productos')
+    fetch('http://localhost:8000/productos')
       .then(res => res.json())
       .then(data => setProductosJSON(data));
   }, [monto, preferencia]);
@@ -53,7 +53,7 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
     setCanastonActual(canaston.productos);
 
     // Iniciar compra en backend
-    const res = await fetch('http://localhost:4000/iniciar_compra', {
+    const res = await fetch('http://localhost:8000/iniciar_compra', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productos: canaston.productos })
@@ -66,7 +66,7 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
   const handleSeleccionProducto = async (producto: Producto) => {
     if (!compraId) return;
 
-    const res = await fetch(`http://localhost:4000/comprar_item/${compraId}`, {
+    const res = await fetch(`http://localhost:8000/comprar_item/${compraId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ producto })
@@ -79,7 +79,7 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
   const handleFinalizarCompra = async () => {
     if (!compraId) return;
 
-    await fetch(`http://localhost:4000/finalizar_compra/${compraId}`, { method: 'POST' });
+    await fetch(`http://localhost:8000/finalizar_compra/${compraId}`, { method: 'POST' });
     alert('Compra finalizada');
     setCompraId(null);
     setCanastonActual([]);
@@ -138,5 +138,5 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
         )}
       </div>
     </div>
-  );
+  );    
 }
