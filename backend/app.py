@@ -11,7 +11,7 @@ from services.agente_compras import (
 )
 from services.reporte import generar_reporte, obtener_reportes
 from services.cargar_productos import cargar_productos
-
+from services.cargar_canaston import cargar_ultimo_cupon
 
 class SolicitudRuta(BaseModel):
     destino: str
@@ -90,6 +90,15 @@ def productos_endpoint():
     Devuelve toda la lista de productos del supermercado
     """
     return cargar_productos()
+
+
+@app.get("/ultimo_cupon")
+def ultimo_cupon_endpoint():
+    """
+    Devuelve el último canastón guardado
+    """
+    return cargar_ultimo_cupon()
+
 
 # ejemplo de llamada
 

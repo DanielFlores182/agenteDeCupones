@@ -15,67 +15,70 @@ const PASILLOS = [
   "mascotas", "pasillo_navideno"
 ];
 
-export default function Planificador({ monto, preferencia }: { monto: number; preferencia?: string }) {
-  const [canastones, setCanastones] = useState<Canaston[]>([]);
-  const [selectedCanaston, setSelectedCanaston] = useState<number | null>(null);
+export default function Planificador() {
+  const [ultimoCanaston, setUltimoCanaston] = useState<Canaston | null>(null);
+  const [sugerencias, setSugerencias] = useState<Canaston[]>([]);
   const [productosJSON, setProductosJSON] = useState<ProductosJSON>({});
   const [pasilloSeleccionado, setPasilloSeleccionado] = useState<string | null>(null);
   const [canastonActual, setCanastonActual] = useState<Producto[]>([]);
   const [compraId, setCompraId] = useState<string | null>(null);
 
-  // Cargar sugerencias de canastones
+  // 1️⃣ Cargar último canastón y productos del supermercado
   useEffect(() => {
-    fetch('http://localhost:8000/recomendar_canastones', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ monto, preferencia })
-    })
+    fetch('http://localhost:8000/ultimo_cupon')
       .then(res => res.json())
-      .then(data => setCanastones(data.canastones || []));
-    
+      .then(data => {
+        if (!data.error) {
+          setUltimoCanaston(data);
+          setSugerencias([data]); // inicialmente la sugerencia es el último canastón
+          setCanastonActual(data.productos);
+        }
+      });
+
     fetch('http://localhost:8000/productos')
       .then(res => res.json())
       .then(data => setProductosJSON(data));
-  }, [monto, preferencia]);
+  }, []);
 
-  // Cambiar productos al seleccionar pasillo
-    const productosPasillo = React.useMemo(() => {
-     if (pasilloSeleccionado && productosJSON[pasilloSeleccionado]) {
-       return productosJSON[pasilloSeleccionado];
-      }
-     return [];
-   }, [pasilloSeleccionado, productosJSON]);
+  // Productos del pasillo seleccionado
+  const productosPasillo = React.useMemo(() => {
+    if (pasilloSeleccionado && productosJSON[pasilloSeleccionado]) {
+      return productosJSON[pasilloSeleccionado];
+    }
+    return [];
+  }, [pasilloSeleccionado, productosJSON]);
 
-  // Selección de canastón
-  const handleSeleccionCanaston = async (index: number) => {
-    setSelectedCanaston(index);
-    const canaston = canastones[index];
-    setCanastonActual(canaston.productos);
-
-    // Iniciar compra en backend
-    const res = await fetch('http://localhost:8000/iniciar_compra', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productos: canaston.productos })
-    });
-    const data = await res.json();
-    setCompraId(data.compra_id); // backend debe devolver compra_id
-  };
-
-  // Selección de producto en pasillo
+  // Manejo de selección de producto
   const handleSeleccionProducto = async (producto: Producto) => {
+    if (!ultimoCanaston) return;
+
+    // 2️⃣ Iniciar compra si no hay compra activa
+    if (!compraId) {
+      const res = await fetch('http://localhost:8000/iniciar_compra', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ultimoCanaston)
+      });
+      const data = await res.json();
+      setCompraId(data.id || data.compra_id); // backend puede devolver "id"
+    }
+
     if (!compraId) return;
 
+    // 3️⃣ Comprar el item seleccionado
     const res = await fetch(`http://localhost:8000/comprar_item/${compraId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ producto })
+      body: JSON.stringify(producto)
     });
     const data = await res.json();
-    setCanastonActual(data.canaston_actual); // backend devuelve estado actualizado
+
+    // 4️⃣ Actualizar canastón actual y sugerencias recalculadas
+    setCanastonActual(data.canaston_actual.productos || []);
+    setSugerencias([data.canaston_actual]); // recalculamos la sugerencia
   };
 
-  // Finalizar compra
+  // 5️⃣ Finalizar compra
   const handleFinalizarCompra = async () => {
     if (!compraId) return;
 
@@ -83,18 +86,23 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
     alert('Compra finalizada');
     setCompraId(null);
     setCanastonActual([]);
+    setSugerencias(ultimoCanaston ? [ultimoCanaston] : []);
   };
 
   return (
     <div style={{ display: 'flex', gap: '20px', padding: '20px' }}>
-      {/* Sugerencias */}
+      {/* Ventana de sugerencias */}
       <div style={{ flex: 1 }}>
-        <h2>Sugerencias de Canastones</h2>
-        {canastones.map((c, i) => (
-          <div key={i} onClick={() => handleSeleccionCanaston(i)}
-               style={{ border: selectedCanaston === i ? '2px solid blue' : '1px solid gray', padding: '10px', marginBottom: '10px', cursor: 'pointer' }}>
-            <p><strong>{c.estrategia || `Canastón ${i+1}`}</strong></p>
+        <h2>Sugerencias</h2>
+        {sugerencias.map((c, i) => (
+          <div key={i} style={{ border: '2px solid blue', padding: '10px', marginBottom: '10px' }}>
+            <p><strong>{c.estrategia || 'Canastón'}</strong></p>
             <p>Total: {c.total_gastado}, Restante: {c.saldo_restante}</p>
+            <ul>
+              {c.productos.map((p, idx) => (
+                <li key={idx}>{p.nombre} - Bs {p.precio}</li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>
@@ -138,5 +146,5 @@ export default function Planificador({ monto, preferencia }: { monto: number; pr
         )}
       </div>
     </div>
-  );    
+  );
 }

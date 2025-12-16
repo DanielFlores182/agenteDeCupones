@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "canaston_001",
+    "monto_cupon": 100,
+    "preferencia": "verduras",
+    "productos": [
+      { "nombre": "Papa (kg)", "precio": 6, "cantidad": 2 },
+      { "nombre": "Tomate (kg)", "precio": 7, "cantidad": 1 },
+      { "nombre": "Pollo (kg)", "precio": 18, "cantidad": 1 },
+      { "nombre": "Detergente", "precio": 15, "cantidad": 1 }
+    ],
+    "total": 52,
+    "fecha": "2025-12-16T01:45:00"
+  },
+  {
+    "id": "canaston_002",
+    "monto_cupon": 80,
+    "preferencia": "carnes",
+    "productos": [
+      { "nombre": "Carne de res (kg)", "precio": 30, "cantidad": 2 },
+      { "nombre": "Pollo (kg)", "precio": 18, "cantidad": 1 }
+    ],
+    "total": 78,
+    "fecha": "2025-12-16T01:50:00"
+  }
+]
