@@ -6,7 +6,7 @@ import uuid
 DATA_PATH = Path(__file__).parent.parent / "data"
 COMPRAS_PATH = DATA_PATH / "compras_activas.json"
 PRODUCTOS_PATH = DATA_PATH / "productos.json"
-
+CANASTONES_PATH = DATA_PATH / "canastones_guardados.json"
 
 # ---------- utilidades ----------
 def leer_json(path, default):
@@ -97,6 +97,39 @@ def finalizar_compra(compra_id: str):
         "comprados": compra["comprados"],
         "total_gastado": sum(p["precio"] for p in compra["comprados"])
     }
+
+# añadido por Mairon
+def obtener_ultimo_canaston_por_fecha():
+    try:
+        if not CANASTONES_PATH.exists():
+            return None
+        
+        with open(CANASTONES_PATH, "r", encoding="utf-8") as f:
+            canastones = json.load(f)
+        
+        if not canastones:
+            return None
+        
+        canastones_con_fecha = [
+            c for c in canastones 
+            if "fecha_creacion" in c or "fecha" in c
+        ]
+        
+        if not canastones_con_fecha:
+            return canastones[-1]
+        
+        canastones_con_fecha.sort(
+            key=lambda x: x.get("fecha_creacion") or x.get("fecha"),
+            reverse=True
+        )
+        
+        print(f"Último canastón por fecha: {canastones_con_fecha[0].get('fecha_creacion', 'sin fecha')}")
+        return canastones_con_fecha[0]
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
 # ejemplo de uso 
 
 # POST /iniciar_compra

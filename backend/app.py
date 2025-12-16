@@ -99,6 +99,28 @@ def ultimo_cupon_endpoint():
     """
     return cargar_ultimo_cupon()
 
+@app.get("/ultimo_canaston")  
+def obtener_ultimo_canaston_endpoint():
+    try:
+        canastones = leer_canastones()
+        
+        if not canastones:
+            return { "error": "No hay canastones guardados", "data": None }
+        
+        ultimo_canaston = canastones[-1]
+        
+        return {
+            "success": True,
+            "data": ultimo_canaston,
+            "total_canastones": len(canastones)
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Error al obtener el último canastón: {str(e)}",
+            "data": None
+        }
 
 # ejemplo de llamada
 
