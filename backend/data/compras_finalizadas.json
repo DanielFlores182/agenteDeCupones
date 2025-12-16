@@ -1,18 +1,1 @@
-[
-  {
-    "id": "e0669a3e-7ddb-4f23-a13c-5b0c1e0e9267",
-    "fecha_inicio": "2025-12-16T10:12:19.381258",
-    "fecha_fin": "2025-12-16T10:12:30.427021",
-    "carrito": [
-      {
-        "nombre": "Panetón",
-        "precio": 25
-      },
-      {
-        "nombre": "Luces navideñas",
-        "precio": 30
-      }
-    ],
-    "total_gastado": 55
-  }
-]
+[]
