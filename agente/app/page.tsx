@@ -87,10 +87,6 @@ export default function Home() {
                 <div style={styles.logoContainer}>
                     <h1 style={styles.logoText}>HIPERMAXI</h1>
                 </div>
-
-                
-
-                {/* Usamos onMouseEnter/onMouseLeave para actualizar el estado de hover */}
                 <Link 
                     href="/planificador" 
                     style={buttonStyle}

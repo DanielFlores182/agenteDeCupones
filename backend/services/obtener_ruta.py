@@ -70,6 +70,11 @@ NODE_MAP = {
     'G2': 'Av. 23 de Marzo entre Eliodoro Villazon',
     'H_Sacaba': 'Hipermaxi Av. Villazon - Sacaba, Av. Villazón Km 3, Cochabamba',
 
+    'I_R1': 'Intersección Av. República y Av. Los Andes (Crucero)', 
+    'I_C1': 'Intersección C. Villa Montes y C. Guayaramerín', 
+    'I_D1': 'Intersección Av. Ayacucho y Av. Huayna Kapac', 
+    'I_E1': 'Intersección Av. Tadeo Haenke y Av. Melchor Pérez de Olguín', 
+    'I_F1': 'Intersección Av. 6 de Agosto y Av. Circunvalación',
     
 
 }
@@ -139,6 +144,26 @@ G.add_weighted_edges_from([
     ('F6', 'G1', 2.60),
     ('G1', 'G2', 1.400),
     ('G2', 'H_Sacaba', 1.300),
+
+    ('A2', 'I_R1', 0.300),
+    ('I_R1', 'B2', 0.250),
+    ('I_R1', 'F1', 0.700),
+    
+    ('B3', 'I_C1', 0.100),
+    ('I_C1', 'C1', 1.000),
+    ('I_C1', 'B4', 0.400),
+    
+    ('D2', 'I_D1', 0.800),
+    ('I_D1', 'E1', 0.600),
+    ('I_D1', 'D4', 0.300), 
+    
+    ('E4', 'I_E1', 0.500),
+    ('I_E1', 'B10', 0.450),
+    ('I_E1', 'F5', 1.800), 
+    
+    ('C2', 'I_F1', 1.200),
+    ('F5', 'I_F1', 1.000),
+    ('I_F1', 'B6', 2.100),
 
 ])
 
