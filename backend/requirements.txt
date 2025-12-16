@@ -1,3 +1,5 @@
 fastapi
 uvicorn
+networkx
+pydantic
 #para montar en la carpeta de backend ejecutar >>>>  pip install -r requirements.txt
